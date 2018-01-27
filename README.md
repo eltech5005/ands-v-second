@@ -1,5 +1,5 @@
-# Hello world project
+# Алгоритмы и структуры данных. Тема 4: Наследование и полиморфизм
 
-This is the famous "Hello world" project for Microsoft Visual Studio Code.
+Выполненные задания по вариантам находятся в ветвях версий с соответствующими именами.
 
-In fact, the goal is to save launch.json and tasks.json for C++ projects (gcc).
+Ветви `variant-5` и `variant-12` содержат проекты для IDE CodeLite.
