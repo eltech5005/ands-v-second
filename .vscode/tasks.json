@@ -12,8 +12,7 @@
                 "-Wall",
                 "-std=c++0x",
                 "-static",
-                "${workspaceRoot}/*.cpp",
-                "${workspaceRoot}/*.h",
+                "${workspaceRoot}/main.cpp",
                 "-o",
                 "${workspaceRoot}/main.run"
             ],
@@ -34,8 +33,7 @@
                 "-Wall",
                 "-std=c++0x",
                 "-g",
-                "${workspaceRoot}/*.cpp",
-                "${workspaceRoot}/*.h",
+                "${workspaceRoot}/main.cpp",
                 "-o",
                 "${workspaceRoot}/main.run"
             ],
