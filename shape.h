@@ -108,7 +108,7 @@ struct shape
 shape *shape ::list = nullptr; // Инициализация списка фигур
 
 // Фигуры, пригодные к повороту
-class rotatable : public shape
+class rotatable : virtual public shape
 {
   public:
     virtual void rotate_left() = 0;  // Повернуть влево
@@ -116,7 +116,7 @@ class rotatable : public shape
 };
 
 // Фигуры, пригодные к зеркальному отражению
-class reflectable : public shape
+class reflectable : virtual public shape
 {
   public:
     virtual void flip_horisontally() = 0; // Отразить горизонтально
@@ -170,7 +170,7 @@ class rectangle : public rotatable
 
   public:
     rectangle(point, point);
-    
+
     point north() const { return point((sw.x + ne.x) / 2, ne.y); }
     point south() const { return point((sw.x + ne.x) / 2, sw.y); }
     point east() const { return point(sw.x, (sw.y + ne.y) / 2); }
@@ -179,7 +179,7 @@ class rectangle : public rotatable
     point seast() const { return point(sw.x, ne.y); }
     point nwest() const { return point(ne.x, sw.y); }
     point swest() const { return sw; }
-    
+
     // Поворот вправо относительно se
     void rotate_right()
     {
@@ -187,7 +187,7 @@ class rectangle : public rotatable
         sw.x = ne.x - h * 2;
         ne.y = sw.y + w / 2;
     }
-    
+
     // Поворот влево относительно sw
     void rotate_left()
     {
@@ -195,7 +195,7 @@ class rectangle : public rotatable
         ne.x = sw.x + h * 2;
         ne.y = sw.y + w / 2;
     }
-    
+
     void move(int a, int b)
     {
         sw.x += a;
@@ -203,7 +203,7 @@ class rectangle : public rotatable
         ne.x += a;
         ne.y += b;
     }
-    
+
     void draw();
 };
 
@@ -235,9 +235,111 @@ void rectangle::draw()
     put_line(sw, nw);
 }
 
+// Прямоугольный треугольник
+class right_triangle : public rotatable, public reflectable
+{
+
+    /* ---
+        {n,nw}
+        |    -
+        |       -
+        w          {c,ne}
+        |              -
+        |                 -
+        sw ------ s ------ se{e} 
+     --- */
+
+    point n, e;
+
+  public:
+    right_triangle(point, point);
+
+    /* ---
+     Мы считаем, что описание точек фигуры за пределами фигуры не имеет смысла
+     для сохранения единообразия фигур, мы объявляем некоторые точки эквивалентными.
+
+     Самая северная и самая северо-западная точки в данном случае совпадают.
+     Анологично с самой восточной и юго-восточной.
+     Самой северо-восточной точкой логично считать середину гипиотенузы треугольника.
+
+     В качестве центра фигуры мы рассматриваем центр описанной вокруг неё окружности.
+     Эта точка также будет совпадать с серединой гипотенузы.
+     --- */
+    
+    point north() const { return n; }
+    point south() const { return point((n.x + e.x) / 2, e.y); }
+    point east() const { return e; }
+    point west() const { return point(n.x, (e.y + n.y) / 2); }
+
+    point neast() const { return point((n.x + e.x)/2, (n.y + e.y)/2); } // https://goo.gl/Fd8DKG
+    point seast() const { return e; }
+    point nwest() const { return n; }
+    point swest() const { return point(n.x,e.y); }
+
+    // Поворот вправо относительно se
+    void rotate_right()
+    {
+        int w = e.x - n.x, h = n.y - e.y;
+        n.y = e.y + w;
+        n.x = e.x - h;
+        e.y = e.y - h;
+    }
+
+    // Поворот влево относительно sw
+    void rotate_left()
+    {
+        int w = e.x - n.x, h = n.y - e.y;
+        e.x = n.x;
+        e.y = n.y + w;
+        n.x = n.x - h;
+        n.y = n.y - h;
+    }
+
+    void flip_horisontally() {}; // Отразить горизонтально
+    void flip_vertically() {};   // Отразить вертикально
+
+
+    void move(int a, int b)
+    {
+        n.x += a;
+        n.y += b;
+        e.x += a;
+        e.y += b;
+    }
+
+    void draw();
+};
+
+
+right_triangle::right_triangle(point a, point b)
+{
+    if (a.x <= b.x)
+    {
+        if (a.y <= b.y)
+            n = a, e = b;
+        else
+            n = point(a.x, b.y), e = point(b.x, a.y);
+    }
+    else
+    {
+        if (a.y <= b.y)
+            n = point(b.x, a.y), e = point(a.x, b.y);
+        else
+            n = b, e = a;
+    }
+}
+
+void right_triangle::draw()
+{
+    point sw = swest();
+    put_line(n, e);
+    put_line(n, sw);
+    put_line(sw, e);
+}
+
 // Перерисовка всех фигур
 // Здесь используется динамическое связывание!!!
-void shape_refresh() 
+void shape_refresh()
 {
     screen_clear();
     for (shape *p = shape ::list; p; p = p->next)
@@ -247,7 +349,7 @@ void shape_refresh()
 
 // Поместить p над q
 // Здесь используется динамическое связывание!!!
-void up(shape *p, const shape *q) 
+void up(shape *p, const shape *q)
 {
     point n = q->north();
     point s = p->south();

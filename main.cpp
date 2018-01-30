@@ -45,7 +45,7 @@ int main()
 {
     screen_init();
     //== 1.Объявление набора фигур ==
-    rotatable *p1 = new rectangle(point(0, 0), point(14, 5));
+    right_triangle *p1 = new right_triangle(point(0, 0), point(14, 5));
     shape *p2 = new line(point(0, 15), 17);
     shape *p3 = new myshape(point(15, 10), point(27, 18));
     shape_refresh();
@@ -56,8 +56,8 @@ int main()
     system("read key"); //Смотреть ориентацию
                      //== 3.Сборка изображения ==
     p3->move(-10, -10);
-    up(p2, p3);
     up(p1, p2);
+    up(p2, p3);
     shape_refresh();
     system("read key"); //Смотреть результат
                      //	screen_destroy( );
