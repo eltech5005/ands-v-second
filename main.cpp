@@ -46,25 +46,14 @@ int main()
     screen_init();
 
     right_triangle *p1 = new right_triangle(point(1, 5), point(6, 1));
+    p1->flip_vertically();
     shape_refresh(); 
     std::cin.get();
 
-p1->rotate_left();
+    
+    p1->flip_horisontally();
     shape_refresh();
     std::cin.get();
-
-    p1->rotate_left();
-    shape_refresh();
-    std::cin.get();
-
-p1->rotate_left();
-    shape_refresh();
-    std::cin.get();
-
-p1->rotate_left();
-    shape_refresh();
-    std::cin.get();
-
 
     return 0;
 }

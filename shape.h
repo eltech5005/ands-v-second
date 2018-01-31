@@ -2,6 +2,8 @@
 // Файл shape.h -- библиотека фигур
 // -----
 
+using namespace std;
+
 char screen[XMAX][YMAX];
 
 enum color
@@ -240,104 +242,121 @@ class right_triangle : public rotatable, public reflectable
 {
 
     /* ---
-        {n,nw}
+        nw        n         ne          
         |    -
         |       -
-        w          {c,ne}
+        w         c         e
         |              -
         |                 -
-        sw ------ s ------ {e,se} 
+        sw ------ s ------  se 
      --- */
 
-    point n, e;
+    point h1, h2, a1;
 
   public:
     right_triangle(point, point);
 
-    /* ---
-     Мы считаем, что описание точек фигуры за пределами фигуры не имеет смысла
-     для сохранения единообразия фигур, мы объявляем некоторые точки эквивалентными.
+    int width() const { return (max(h1.x, h2.x) - min(h1.x, h2.x)); }
+    int margin_x() const { return min(min(h1.x, h2.x), a1.x); }
+    int height() const { return (max(h1.y, h2.y) - min(h1.y, h2.y)); }
+    int margin_y() const { return min(min(h1.y, h2.y), a1.y); }
 
-     Самая северная и самая северо-западная точки в данном случае совпадают.
-     Анологично с самой восточной и юго-восточной.
-     Самой северо-восточной точкой логично считать середину гипиотенузы треугольника.
-
-     В качестве центра фигуры мы рассматриваем центр описанной вокруг неё окружности.
-     Эта точка также будет совпадать с серединой гипотенузы.
-     --- */
-    
-    point north() const { return n; }
-    point south() const { return point((n.x + e.x) / 2, e.y); }
-    point east()  const { return e; }
-    point west()  const { return point(n.x, (e.y + n.y) / 2); }
-    point neast() const { return point((n.x + e.x)/2, (n.y + e.y)/2); } // https://goo.gl/Fd8DKG
-    point seast() const { return e; }
-    point nwest() const { return n; }
-    point swest() const { return point(n.x,e.y); }
-
-    // Поворот вправо относительно se
-    void rotate_right()
-    {
-        int w = e.x - n.x;
-        int h = n.y - e.y;
-
-        n.y = e.y;
-        n.x = e.x - h;
-        e.y=e.y+w;        
-    }
-
+    point north() const { return point(margin_x() + width() / 2, margin_y() + height()); }
+    point south() const { return point(margin_x() + width() / 2, margin_y()); }
+    point west() const { return point(margin_x(), margin_y() + height() / 2); }
+    point east() const { return point(margin_x() + width(), margin_y() + height() / 2); }
+    point nwest() const { return point(margin_x(), margin_y() + height()); }
+    point neast() const { return point(margin_x() + width(), margin_y() + height()); }
+    point swest() const { return point(margin_x(), margin_y()); }
+    point seast() const { return point(margin_x() + width(), margin_y()); }
 
     // Поворот влево относительно sw
     void rotate_left()
     {
-        int w = e.x - n.x;
-        int h = n.y - e.y;
+        int w = width();
+        int h = height();
 
-        n.y = e.y + w;
-        n.x = n.x + h;
-        e.x = e.x - w;
+        h1.y -= h;
+        a1.x += h;
+        h2.x = h1.x + h;
+        h2.y += w;
+
     }
 
-    void flip_horisontally() {}; // Отразить горизонтально
-    void flip_vertically() {};   // Отразить вертикально
+    // Поворот вправо относительно se
+    void rotate_right()
+    {
+        int w = width();
+        int h = height();
 
+        h1.y = a1.y + w;
+        h1.x = h2.x;
+        a1.y = h1.y;
+        a1.x = h1.x-h;
+        h2.x = a1.x;
+
+    }
+
+    // Отразить горизонтально
+    void flip_horisontally(){
+        if (a1.y == h1.y)
+            a1.y = h2.y;
+        else 
+            a1.y = h1.y;
+        swap (h1.y, h2.y);
+        
+    };
+
+    // Отразить вертикально
+    void flip_vertically(){
+        if (a1.x == h1.x)
+            a1.x = h2.x;
+        else 
+            a1.x = h1.x;
+        swap (h1.x, h2.x);
+    };   
 
     void move(int a, int b)
     {
-        n.x += a;
-        n.y += b;
-        e.x += a;
-        e.y += b;
+        h1.x += a;
+        h1.y += b;
+        h2.x += a;
+        h2.y += b;
+        a1.x += a;
+        a1.y += b;
     }
 
     void draw();
 };
 
-
+/* ---
+   При начальном формировании фигурвы мы считаем, что треугольник изображён именно так, как показано на рисунке в задании
+   --- */
 right_triangle::right_triangle(point a, point b)
 {
     if (a.x <= b.x)
     {
         if (a.y >= b.y)
-            n = a, e = b;
+            h1 = a, h2 = b;
         else
-            n = point(a.x, b.y), e = point(b.x, a.y);
+            h1 = point(a.x, b.y), h2 = point(b.x, a.y);
     }
     else
     {
         if (b.y >= a.y)
-            n = b, e = a;
+            h1 = b, h2 = a;
         else
-            n = point(b.x, a.y), e = point(a.x, b.y);
+            h1 = point(b.x, a.y), h2 = point(a.x, b.y);
     }
+
+    a1 = point(h1.x, h2.y);
 }
 
 void right_triangle::draw()
 {
-    point sw = swest();
-    put_line(n, e);
-    put_line(n, sw);
-    put_line(sw, e);
+    put_line(h1, a1);
+    put_line(a1, h2);
+    put_line(h1, h2);
 }
 
 // Перерисовка всех фигур
