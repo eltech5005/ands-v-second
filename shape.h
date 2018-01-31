@@ -287,11 +287,19 @@ class right_triangle : public rotatable, public reflectable
     // Поворот влево относительно sw
     void rotate_left()
     {
-        int w = e.x - n.x, h = n.y - e.y;
-        e.x = n.x;
-        e.y = n.y + w;
-        n.x = n.x - h;
-        n.y = n.y - h;
+        int w = e.x - n.x;
+        int h = n.y - e.y;
+        
+        // Было бы правильно, если бы оно работало вот так:
+        // e.y = e.y + w;
+        // e.x = n.x + h;
+        // n.y = n.y - h;
+
+        n.y = e.y + w;
+        n.x = n.x + h;
+
+        e.x = e.x - h;
+
     }
 
     void flip_horisontally() {}; // Отразить горизонтально
