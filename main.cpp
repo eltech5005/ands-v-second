@@ -44,22 +44,27 @@ void myshape ::move(int a, int b)
 int main()
 {
     screen_init();
-    //== 1.Объявление набора фигур ==
-    right_triangle *p1 = new right_triangle(point(0, 0), point(14, 5));
-    shape *p2 = new line(point(0, 15), 17);
-    shape *p3 = new myshape(point(15, 10), point(27, 18));
+
+    right_triangle *p1 = new right_triangle(point(1, 5), point(6, 1));
+    shape_refresh(); 
+    std::cin.get();
+
+p1->rotate_left();
     shape_refresh();
-    system("read key"); //Смотреть исходный набор
-                     //== 2.Ориентация ==
-    p1->rotate_right();
+    std::cin.get();
+
+    p1->rotate_left();
     shape_refresh();
-    system("read key"); //Смотреть ориентацию
-                     //== 3.Сборка изображения ==
-    p3->move(-10, -10);
-    up(p1, p2);
-    up(p2, p3);
+    std::cin.get();
+
+p1->rotate_left();
     shape_refresh();
-    system("read key"); //Смотреть результат
-                     //	screen_destroy( );
+    std::cin.get();
+
+p1->rotate_left();
+    shape_refresh();
+    std::cin.get();
+
+
     return 0;
 }
