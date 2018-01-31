@@ -136,14 +136,14 @@ class line : public shape
   public:
     line(point a, point b) : w(a), e(b){};
     line(point a, int L) : w(point(a.x + L - 1, a.y)), e(a){};
-    point north() const { return point((w.x + e.x) / 2, e.y < w.y ? w.y : e.y); }
-    point south() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
-    point east() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
-    point west() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
-    point neast() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
-    point seast() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
-    point nwest() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
-    point swest() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
+        point north() const { return point((w.x + e.x) / 2, (w.y + e.y) / 2); }
+    point south() const { return point((w.x + e.x) / 2, (w.y + e.y) / 2); }
+    point east() const { return e; }
+    point west() const { return w; }
+    point neast() const { return e; }
+    point seast() const { return e; }
+    point nwest() const { return w; }
+    point swest() const { return w; }
 
     void move(int a, int b)
     {
@@ -376,4 +376,24 @@ void up(shape *p, const shape *q)
     point n = q->north();
     point s = p->south();
     p->move(n.x - s.x, n.y - s.y + 1);
+}
+
+void lftUp(shape* p, const shape* q)// Поместить p слева над q
+{
+    p->move(q->nwest().x - p->swest().x, q->nwest().y - p->swest().y + 1);
+}
+
+void rgtUp(shape* p, const shape* q)// Поместить p справа над q
+{
+    p->move(q->neast().x - p->seast().x, q->nwest().y - p->swest().y + 1);
+}
+
+void rgtDwn(shape* p, const shape* q)// Поместить p справа под q
+{
+    p->move(q->east().x - p->west().x, q->swest().y - p->nwest().y);
+}
+
+void lftDwn(shape* p, const shape* q)// Поместить p справа под q
+{
+    p->move(q->west().x - p->east().x, q->swest().y - p->nwest().y);
 }
