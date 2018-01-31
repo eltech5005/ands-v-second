@@ -3,7 +3,7 @@
 // -----
 
 const int XMAX = 80; // Размер экрана
-const int YMAX = 40;
+const int YMAX = 65;
 
 // Точка на экране
 class point

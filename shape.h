@@ -246,7 +246,7 @@ class right_triangle : public rotatable, public reflectable
         w          {c,ne}
         |              -
         |                 -
-        sw ------ s ------ se{e} 
+        sw ------ s ------ {e,se} 
      --- */
 
     point n, e;
@@ -268,9 +268,8 @@ class right_triangle : public rotatable, public reflectable
     
     point north() const { return n; }
     point south() const { return point((n.x + e.x) / 2, e.y); }
-    point east() const { return e; }
-    point west() const { return point(n.x, (e.y + n.y) / 2); }
-
+    point east()  const { return e; }
+    point west()  const { return point(n.x, (e.y + n.y) / 2); }
     point neast() const { return point((n.x + e.x)/2, (n.y + e.y)/2); } // https://goo.gl/Fd8DKG
     point seast() const { return e; }
     point nwest() const { return n; }
@@ -315,17 +314,17 @@ right_triangle::right_triangle(point a, point b)
 {
     if (a.x <= b.x)
     {
-        if (a.y <= b.y)
+        if (a.y >= b.y)
             n = a, e = b;
         else
             n = point(a.x, b.y), e = point(b.x, a.y);
     }
     else
     {
-        if (a.y <= b.y)
-            n = point(b.x, a.y), e = point(a.x, b.y);
-        else
+        if (b.y >= a.y)
             n = b, e = a;
+        else
+            n = point(b.x, a.y), e = point(a.x, b.y);
     }
 }
 
