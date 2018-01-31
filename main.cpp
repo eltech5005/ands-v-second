@@ -43,39 +43,50 @@ void myshape ::move(int a, int b)
 
 int main()
 {
-
+    try {
         screen_init();
-    // ----- Объявление набора фигур -----
-    rotatable *p1 = new rectangle(point(0, 0), point(14, 5));
-    shape *p2 = new line(point(0, 15), 17);
-    shape *p3 = new myshape(point(15, 10), point(27, 18));
-    right_triangle *p4 = new right_triangle(point(31, 5), point(36, 1));
-    right_triangle *p5 = new right_triangle(point(41, 5), point(46, 1));
-    right_triangle *p6 = new right_triangle(point(31, 15), point(36, 11));
-    right_triangle *p7 = new right_triangle(point(41, 15), point(46, 11));
+        // ----- Объявление набора фигур -----
+        rotatable *p1 = new rectangle(point(0, 0), point(14, 5));
+        shape *p2 = new line(point(0, 15), 17);
+        shape *p3 = new myshape(point(15, 10), point(27, 18));
+        right_triangle *p4 = new right_triangle(point(31, 5), point(36, 1));
+        right_triangle *p5 = new right_triangle(point(41, 5), point(46, 1));
+        right_triangle *p6 = new right_triangle(point(31, 15), point(36, 11));
+        right_triangle *p7 = new right_triangle(point(41, 15), point(46, 11));
 
-    // ----- Вывод начального набора фигур -----
-    shape_refresh(); std::cin.get();
+        // ----- Вывод начального набора фигур -----
+        shape_refresh(); std::cin.get();
 
-    // ----- Выполнение отражений и переворотов и вывод на экран -----
-    p1->rotate_right();
-    p4->flip_vertically();
-    p6->flip_vertically();
-    shape_refresh(); std::cin.get(); 
-    
-    // ----- Перемещение фигур и вывод результата -----
-    p3->move(30,0);
-    p3->move(-10,10);
+        // ----- Выполнение отражений и переворотов и вывод на экран -----
+        p1->rotate_right();
+        p4->flip_vertically();
+        p6->flip_vertically();
+        shape_refresh(); std::cin.get(); 
+        
+        // ----- Перемещение фигур и вывод результата -----
+        p3->move(30,0);
+        p3->move(-10,10);
 
-    up(p2, p3);
-    up(p1, p2);
-    lftUp(p4,p2);
-    rgtUp(p5,p2);
-    lftDwn(p7,p3);
-    rgtDwn(p6,p3);
-    p6->move(-6,4);
-    p7->move(6,4);
-    shape_refresh(); std::cin.get();
+        up(p2, p3);
+        up(p1, p2);
+        lftUp(p4,p2);
+        rgtUp(p5,p2);
+        lftDwn(p7,p3);
+        rgtDwn(p6,p3);
+        p6->move(-6,4);
+        p7->move(6,4);
+        shape_refresh(); 
+    }    
+    catch (right_triangle::Exception e){
+		std::cout << "Сработало исключение " << e.what() << "\nЗначения точек:";
+		e.showPoints();
+		std::cout << endl;
+	}
+    catch (shape::onScrException e) {
+		cout << "Точка "; e.showPoint(); cout << " за пределами экрана" << endl;
+	}
+
+    std::cin.get();
 
     return 0;
 }

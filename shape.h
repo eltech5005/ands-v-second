@@ -6,6 +6,8 @@ using namespace std;
 
 char screen[XMAX][YMAX];
 
+int on_screen(int a, int b);
+
 enum color
 {
     black = '*',
@@ -17,12 +19,6 @@ void screen_init()
     for (int y = 0; y < YMAX; y++)
         for (int x = 0; x < XMAX; x++)
             screen[x][y] = white;
-}
-
-// Проверка попадания на экран
-int on_screen(int a, int b)
-{
-    return 0 <= a && a < XMAX && 0 <= b && b < YMAX;
 }
 
 void put_point(int a, int b)
@@ -105,7 +101,24 @@ struct shape
 
     virtual void draw() = 0;
     virtual void move(int, int) = 0;
+
+    class onScrException
+    {
+        point p;
+    public:
+        onScrException(point p0) : p(p0) {};
+        void showPoint() {
+            std::cout << '(' << p.x << ", " << p.y << ')';
+        }
+    };
+
 };
+
+// Проверка попадания на экран
+int on_screen(int a, int b)
+{
+    return (0 <= a && a < XMAX && 0 <= b && b < YMAX)?1:throw shape::onScrException(point(a, b));
+}
 
 shape *shape ::list = nullptr; // Инициализация списка фигур
 
@@ -327,6 +340,27 @@ class right_triangle : public rotatable, public reflectable
     }
 
     void draw();
+
+    class Exception
+    {
+        point a;
+        point b;
+        point c;
+        std::string w;
+    
+        public:
+            Exception(point p0, point p1, point p2, std::string str) : 
+                a(p0), b(p1), c(p2), w(str) {};
+            std::string what() { return w; }
+
+            void showPoints() {
+                std::cout << '(' << a.x << ", " << a.y << ") ";
+                std::cout << '(' << b.x << ", " << b.y << ") ";
+                std::cout << '(' << c.x << ", " << c.y << ')';
+            }
+
+    };
+
 };
 
 /* ---
@@ -334,6 +368,12 @@ class right_triangle : public rotatable, public reflectable
    --- */
 right_triangle::right_triangle(point a, point b)
 {
+     if (a.x < 0 || a.y < 0 
+        || b.x < 0 || b.y < 0) {
+        throw Exception(a, b, point(-228,-228), 
+            "в конструкторе Triangle\nНекорректные параметры");
+    }
+
     if (a.x <= b.x)
     {
         if (a.y >= b.y)
